@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📰 오늘의 이슈 TOP 5 — 트렌드 랭킹</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    /* ===== CSS Reset & Variables ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43d9ad;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+      --text: #e8eaf6;
+      --text-muted: #8892b0;
+      --border: rgba(108,99,255,0.18);
+      --radius: 16px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.45);
+      --rank1: linear-gradient(135deg,#ffd700,#ff9f43);
+      --rank2: linear-gradient(135deg,#c0c0c0,#a0a0a0);
+      --rank3: linear-gradient(135deg,#cd7f32,#a0522d);
+      --rank4: linear-gradient(135deg,#6c63ff,#a855f7);
+      --rank5: linear-gradient(135deg,#43d9ad,#06b6d4);
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== Animated Background ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(108,99,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, rgba(67,217,173,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== Header ===== */
+    header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 56px 24px 32px;
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: 99px;
+      margin-bottom: 18px;
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.15;
+      background: linear-gradient(90deg, #fff 30%, var(--accent) 70%, var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p.subtitle {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    .date-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 18px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .date-chip span { color: var(--accent3); font-weight: 600; }
+
+    /* ===== Filter Tabs ===== */
+    .filter-bar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 24px 36px;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 99px;
+      padding: 8px 22px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(108,99,255,0.35);
+    }
+
+    /* ===== Main Layout ===== */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* ===== Ranking Cards ===== */
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .rank-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0 24px;
+      align-items: start;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rank-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .rank-card[data-rank="1"]::before { background: linear-gradient(120deg, rgba(255,215,0,0.06), transparent 60%); }
+    .rank-card[data-rank="2"]::before { background: linear-gradient(120deg, rgba(192,192,192,0.06), transparent 60%); }
+    .rank-card[data-rank="3"]::before { background: linear-gradient(120deg, rgba(205,127,50,0.06), transparent 60%); }
+    .rank-card[data-rank="4"]::before { background: linear-gradient(120deg, rgba(108,99,255,0.06), transparent 60%); }
+    .rank-card[data-rank="5"]::before { background: linear-gradient(120deg, rgba(67,217,173,0.06), transparent 60%); }
+
+    .rank-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .rank-card:hover::before { opacity: 1; }
+
+    .rank-card[data-rank="1"]:hover { border-color: rgba(255,215,0,0.4); }
+    .rank-card[data-rank="2"]:hover { border-color: rgba(192,192,192,0.4); }
+    .rank-card[data-rank="3"]:hover { border-color: rgba(205,127,50,0.4); }
+    .rank-card[data-rank="4"]:hover { border-color: rgba(108,99,255,0.4); }
+    .rank-card[data-rank="5"]:hover { border-color: rgba(67,217,173,0.4); }
+
+    /* Rank Badge */
+    .rank-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 900;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .rank-card[data-rank="1"] .rank-badge { background: var(--rank1); color: #5a3e00; }
+    .rank-card[data-rank="2"] .rank-badge { background: var(--rank2); color: #3a3a3a; }
+    .rank-card[data-rank="3"] .rank-badge { background: var(--rank3); color: #fff; }
+    .rank-card[data-rank="4"] .rank-badge { background: var(--rank4); color: #fff; }
+    .rank-card[data-rank="5"] .rank-badge { background: var(--rank5); color: #003a2e; }
+
+    .rank-badge .crown {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+    }
+
+    /* Card Body */
+    .card-body { min-width: 0; }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .category-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+
+    .tag-politics  { background: rgba(239,68,68,0.18);  color: #f87171; }
+    .tag-security  { background: rgba(251,146,60,0.18); color: #fb923c; }
+    .tag-economy   { background: rgba(250,204,21,0.18); color: #fbbf24; }
+    .tag-tech      { background: rgba(108,99,255,0.18); color: #a78bfa; }
+    .tag-global    { background: rgba(67,217,173,0.18); color: #34d399; }
+
+    .card-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .card-title {
+      font-size: clamp(1rem, 2.2vw, 1.22rem);
+      font-weight: 700;
+      line-height: 1.45;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .card-summary {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .hashtag {
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: rgba(108,99,255,0.1);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 500;
+    }
+
+    /* Score Bar */
+    .card-score {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+      min-width: 90px;
+    }
+
+    .score-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .score-value {
+      font-size: 1.7rem;
+      font-weight: 900;
+    }
+
+    .rank-card[data-rank="1"] .score-value { color: var(--gold); }
+    .rank-card[data-rank="2"] .score-value { color: var(--silver); }
+    .rank-card[data-rank="3"] .score-value { color: var(--bronze); }
+    .rank-card[data-rank="4"] .score-value { color: #a78bfa; }
+    .rank-card[data-rank="5"] .score-value { color: var(--accent3); }
+
+    .score-bar-wrap {
+      width: 90px;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .score-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1.2s cubic-bezier(.22,1,.36,1);
+    }
+
+    .rank-card[data-rank="1"] .score-bar { background: var(--rank1); }
+    .rank-card[data-rank="2"] .score-bar { background: var(--rank2); }
+    .rank-card[data-rank="3"] .score-bar { background: var(--rank3); }
+    .rank-card[data-rank="4"] .score-bar { background: var(--rank4); }
+    .rank-card[data-rank="5"] .score-bar { background: var(--rank5); }
+
+    .trend-indicator {
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .trend-up   { color: #34d399; }
+    .trend-down { color: #f87171; }
+    .trend-same { color: var(--text-muted); }
+
+    /* ===== Expand Detail Panel ===== */
+    .card-detail {
+      grid-column: 1 / -1;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(.22,1,.36,1);
+    }
+
+    .card-detail.open { max-height: 500px; }
+
+    .detail-inner {
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+      padding-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .detail-section h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .detail-section p {
+      font-size: 0.87rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    .key-points { list-style: none; }
+
+    .key-points li {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 5px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .key-points li::before {
+      content: '▸';
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      color: var(--accent3);
+      text-decoration: none;
+      margin-top: 8px;
+      border-bottom: 1px dashed rgba(67,217,173,0.3);
+      padding-bottom: 2px;
+      transition: color 0.2s;
+    }
+
+    .source-link:hover { color: #fff; }
+
+    /* ===== Chart Section ===== */
+    .chart-section {
+      margin-top: 56px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .section-title span {
+      color: var(--accent);
+    }
+
+    .chart-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chart-tab {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .chart-tab.active, .chart-tab:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 320px;
+    }
+
+    /* ===== Stats Row ===== */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover { transform: translateY(-3px); }
+
+    .stat-icon { font-size: 1.8rem; margin-bottom: 8px; }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 32px 24px 48px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.8;
+    }
+
+    footer a {
+      color: var(--accent3);
+      text-decoration: none;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 640px) {
+      .rank-card {
+        grid-template-columns: auto 1fr;
+        padding: 20px 18px;
+        gap: 0 16px;
+      }
+
+      .card-score { display: none; }
+
+      .detail-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-wrap { height: 240px; }
+    }
+
+    /* ===== Scroll Animation ===== */
+    .rank-card {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.55s ease forwards;
+    }
+
+    .rank-card:nth-child(1) { animation-delay: 0.05s; }
+    .rank-card:nth-child(2) { animation-delay: 0.15s; }
+    .rank-card:nth-child(3) { animation-delay: 0.25s; }
+    .rank-card:nth-child(4) { animation-delay: 0.35s; }
+    .rank-card:nth-child(5) { animation-delay: 0.45s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Pulse for #1 ===== */
+    .rank-card[data-rank="1"] .rank-badge::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,215,0,0.5);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%       { transform: scale(1.15); opacity: 0; }
+    }
+
+    /* ===== Share Button ===== */
+    .share-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 100;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 54px;
+      height: 54px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(108,99,255,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .share-btn:hover { transform: scale(1.1); }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      right: 28px;
+      z-index: 200;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 0.85rem;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== Update Ticker ===== */
+    .ticker-wrap {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 0;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    .ticker-inner {
+      display: flex;
+      gap: 60px;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-item {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .ticker-item strong { color: var(--accent3); margin-right: 6px; }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker"></div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="header-badge">🔥 LIVE TRENDING</div>
+  <h1>오늘의 이슈 TOP 5</h1>
+  <p class="subtitle">AI가 취합한 최신 뉴스 트렌드 랭킹 — 매일 업데이트</p>
+  <div class="date-chip">
+    📅 업데이트: <span id="today-date"></span>
+  </div>
+</header>
+
+<!-- Filter -->
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">전체</button>
+  <button class="filter-btn" data-filter="politics">정치·사회</button>
+  <button class="filter-btn" data-filter="security">보안·IT</button>
+  <button class="filter-btn" data-filter="economy">경제</button>
+  <button class="filter-btn" data-filter="tech">AI·기술</button>
+  <button class="filter-btn" data-filter="global">글로벌</button>
+</div>
+
+<!-- Main -->
+<main>
+  <div class="ranking-list" id="ranking-list"></div>
+
+  <!-- Chart Section -->
+  <div class="chart-section">
+    <div class="section-header">
+      <div class="section-title">📊 이슈 <span>관심도</span> 분석</div>
+      <div class="chart-tabs">
+        <button class="chart-tab active" data-chart="bar">막대</button>
+        <button class="chart-tab" data-chart="radar">레이더</button>
+        <button class="chart-tab" data-chart="doughnut">도넛</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="mainChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">📰</div>
+      <div class="stat-value">5</div>
+      <div class="stat-label">선정된 이슈</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔍</div>
+      <div class="stat-value" id="stat-sources">12+</div>
+      <div class="stat-label">참고 출처</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📈</div>
+      <div class="stat-value">98</div>
+      <div class="stat-label">최고 관심도 점수</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🌐</div>
+      <div class="stat-value">5</div>
+      <div class="stat-label">카테고리</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>데이터 수집 기준: 2026년 4월 30일 | 주요 언론사·포털 뉴스 종합 분석</p>
+  <p style="margin-top:6px;">Made with ❤️ — <a href="https://github.com/" target="_blank">GitHub에서 보기</a></p>
+</footer>
+
+<!-- Share Button -->
+<button class="share-btn" id="shareBtn" title="공유하기">🔗</button>
+<div class="toast" id="toast">링크가 클립보드에 복사되었습니다!</div>
+
+<script>
+// ===== DATA =====
+const newsData = [
+  {
+    rank: 1,
+    category: "security",
+    categoryLabel: "보안·IT",
+    tagClass: "tag-security",
+    date: "2026.04.29 ~ 04.30",
+    title: "SKT 유심 해킹 사태 1주년 — 통신 3사 보안 위기 재점화",
+    summary: "2025년 4월 발생한 SK텔레콤 유심(USIM) 해킹 사태가 1주년을 맞이한 가운데, KT·LG U+ 추가 피해가 밝혀지며 통신 3사 전체의 보안 위기로 확산됐다. 피해 규모는 2,695만 건 이상이며, 개인정보보호위원회는 역대 최대인 1,348억 원의 과징금을 부과했다.",
+    score: 98,
+    trend: "up",
+    trendText: "▲ 급상승",
+    hashtags: ["#SKT해킹", "#유심보안", "#개인정보유출", "#통신보안"],
+    detail: {
+      background: "2025년 4월 SKT 핵심 서버가 'BPFDoor' 악성코드에 감염되어 약 9.82GB의 유심 인증 정보가 유출됐다. 악성코드는 2022년부터 잠복해 있었던 것으로 추정되며, 감염 서버 23대·악성코드 25종이 발견됐다.",
+      keyPoints: [
+        "피해 규모: IMSI 기준 2,695만 건 이상 (국민 절반)",
+        "개인정보위 과징금 1,348억 원 — 역대 최대 규모",
+        "SKT 해킹 손해액 8,009억 원, KT 고객 보상 4,500억 원",
+        "통신 3사 모두 유사 보안 취약점 노출 확인",
+        "심 스와핑(SIM Swapping) 위협 지속 — FDS로 차단 중"
+      ],
+      source: "https://www.etnews.com/20260424000081"
+    }
+  },
+  {
+    rank: 2,
+    category: "politics",
+    categoryLabel: "정치·사회",
+    tagClass: "tag-politics",
+    date: "2026.04.29",
+    title: "윤석열 전 대통령 항소심 징역 7년 선고 — 1심보다 2년 증가",
+    summary: "서울고등법원 내란전담재판부는 공수처 체포영장 집행 방해 등의 혐의로 기소된 윤석열 전 대통령에게 항소심에서 징역 7년을 선고했다. 1심(징역 5년)보다 2년 늘어난 형량으로, 국무위원 심의권 침해 혐의가 추가로 인정됐다.",
+    score: 95,
+    trend: "up",
+    trendText: "▲ 급상승",
+    hashtags: ["#윤석열", "#항소심", "#징역7년", "#내란"],
+    detail: {
+      background: "윤석열 전 대통령은 2024년 12월 비상계엄 선포 이후 공수처 체포영장 집행 방해 혐의 등으로 기소됐다. 1심에서 징역 5년을 선고받았으나 항소심에서 형량이 상향됐다.",
+      keyPoints: [
+        "항소심 선고: 징역 7년 (1심 5년 → 2년 증가)",
+        "혐의: 체포영장 집행 방해, 국무위원 심의권 침해 등",
+        "서울고등법원 내란전담재판부 판결 (2026.04.29)",
+        "외신 허위공보 지시 혐의도 일부 인정",
+        "대법원 최종 판결 향후 예정"
+      ],
+      source: "https://www.joongang.co.kr/article/25424493"
+    }
+  },
+  {
+    rank: 3,
+    category: "economy",
+    categoryLabel: "경제",
+    tagClass: "tag-economy",
+    date: "2026.04.28 ~ 04.30",
+    title: "트럼프 관세 역설 — 미국 대법원 무효 판결에도 무역 갈등 지속",
+    summary: "미국 연방대법원이 트럼프 대통령의 IEEPA 기반 상호관세를 불법으로 판결했음에도 트럼프 행정부는 무역법 301조 카드를 꺼내며 관세 정책을 이어가고 있다. 글로벌 교역 증가율이 2025년 3.8%에서 2.2%로 급감할 것으로 유엔이 전망했다.",
+    score: 88,
+    trend: "up",
+    trendText: "▲ 상승",
+    hashtags: ["#트럼프관세", "#미중무역", "#글로벌경제", "#관세전쟁"],
+    detail: {
+      background: "트럼프 2기 행정부의 중국산 145% 관세가 4월 9일 발효된 이후 한국 유통·식품 업계에도 영향이 확산되고 있다. 미국 대법원이 IEEPA 기반 관세를 무효로 판결했으나 행정부는 다른 법적 근거를 활용해 관세 정책을 유지 중이다.",
+      keyPoints: [
+        "미 연방대법원: IEEPA 기반 관세 불법 판결",
+        "트럼프 행정부: 무역법 301조로 관세 정책 지속",
+        "UN 전망: 글로벌 교역 증가율 3.8% → 2.2% 급감",
+        "세계 GDP 성장률 2.7%로 하향 조정",
+        "GM 등 기업들 관세 환급 신청 vs. 트럼프 압박"
+      ],
+      source: "https://www.hani.co.kr/arti/economy/economy_general/1255289.html"
+    }
+  },
+  {
+    rank: 4,
+    category: "tech",
+    categoryLabel: "AI·기술",
+    tagClass: "tag-tech",
+    date: "2026.04.23 ~ 04.30",
+    title: "AI 기술 최고조 vs. 대중 반감 — 스탠퍼드 AI 인덱스 2026 발표",
+    summary: "스탠퍼드 HAI가 발표한 AI 인덱스 2026에서 한국의 AI 모델이 5개에서 8개로 정정 확인됐다. 메타·MS의 AI 투자 확대와 동시에 대규모 인력 감축이 이어지며 AI 기술 발전과 사회적 반감이 역설적으로 공존하는 현상이 주목받고 있다.",
+    score: 82,
+    trend: "up",
+    trendText: "▲ 상승",
+    hashtags: ["#AI트렌드", "#스탠퍼드AI", "#인공지능", "#AI인덱스2026"],
+    detail: {
+      background: "2026 월드 IT 쇼(서울 코엑스, 4월 22~24일)에서 '생각을 넘어 행동으로: 인공지능, 현실을 움직이다'를 슬로건으로 다양한 AI 기술이 선보였다. AI가 교육·의료·산업 전반에 임베디드 인프라로 전환 중이다.",
+      keyPoints: [
+        "스탠퍼드 AI 인덱스 2026: 한국 AI 모델 8개 확정",
+        "메타·MS: AI 투자 확대 + 동시에 대규모 인력 구조조정",
+        "OpenAI 머스크-알트먼 법적 갈등 지속",
+        "AI 데이터센터 탄소 배출 영향 과소평가 논란",
+        "2026 월드 IT 쇼 — AI 현실 적용 사례 대거 공개"
+      ],
+      source: "https://www.smath.world/insight/ai-trend-news-ai-2026-20260423-2144"
+    }
+  },
+  {
+    rank: 5,
+    category: "global",
+    categoryLabel: "글로벌",
+    tagClass: "tag-global",
+    date: "2026.04.26 ~ 04.30",
+    title: "미중 정상회담 불투명 — 이란 호르무즈 긴장·만찬 총격 변수",
+    summary: "트럼프 5월 방중 계획이 이란의 호르무즈 해협 봉쇄 경고와 미국 만찬장 총격 사건으로 불투명해졌다. 미중 간 AI·반도체 공급망 신경전도 격화되며 글로벌 지정학적 불안이 고조되고 있다.",
+    score: 75,
+    trend: "same",
+    trendText: "— 유지",
+    hashtags: ["#미중관계", "#이란호르무즈", "#트럼프방중", "#지정학"],
+    detail: {
+      background: "트럼프 대통령의 5월 방중 계획이 이란의 호르무즈 해협 봉쇄 위협과 미국 내 만찬장 총격 사건으로 재조정 가능성이 높아졌다. 미중 무역 협상은 이란 위기에 밀려 의제 우선순위가 변동됐다.",
+      keyPoints: [
+        "이란 강경파: 호르무즈 해협 봉쇄 '전례 없는 군사 조치' 경고",
+        "미국 만찬장 총격 사건 — 경호 긴장감 고조",
+        "트럼프 5월 방중 재검토 — 사전 고위급 협의 없음",
+        "미중 AI·반도체 공급망 신경전 격화",
+        "한국 주한미군 '킬웹' 전략 논의 부상"
+      ],
+      source: "https://www.donga.com/news/Inter/article/all/20260427/133822965/2"
+    }
+  }
+];
+
+// ===== TICKER =====
+const tickerItems = [
+  { label: "🔥 1위", text: "SKT 유심 해킹 1주년 — 통신 3사 보안 위기" },
+  { label: "⚖️ 2위", text: "윤석열 항소심 징역 7년 선고" },
+  { label: "💹 3위", text: "트럼프 관세 대법원 무효 판결에도 지속" },
+  { label: "🤖 4위", text: "스탠퍼드 AI 인덱스 2026 — 한국 모델 8개" },
+  { label: "🌏 5위", text: "미중 정상회담 불투명 — 이란·총격 변수" },
+];
+
+function buildTicker() {
+  const el = document.getElementById('ticker');
+  const doubled = [...tickerItems, ...tickerItems];
+  el.innerHTML = doubled.map(i =>
+    `<span class="ticker-item"><strong>${i.label}</strong>${i.text}</span>`
+  ).join('');
+}
+
+// ===== DATE =====
+function setDate() {
+  const d = new Date();
+  const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+  document.getElementById('today-date').textContent = d.toLocaleDateString('ko-KR', opts);
+}
+
+// ===== RENDER CARDS =====
+function renderCards(filter = 'all') {
+  const list = document.getElementById('ranking-list');
+  const filtered = filter === 'all' ? newsData : newsData.filter(n => n.category === filter);
+
+  list.innerHTML = filtered.map(n => `
+    <div class="rank-card" data-rank="${n.rank}" data-category="${n.category}" onclick="toggleDetail(this)">
+      <div class="rank-badge">
+        ${n.rank === 1 ? '<span class="crown">👑</span>' : ''}
+        ${n.rank}
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="category-tag ${n.tagClass}">${n.categoryLabel}</span>
+          <span class="card-date">${n.date}</span>
+        </div>
+        <h2 class="card-title">${n.title}</h2>
+        <p class="card-summary">${n.summary}</p>
+        <div class="card-tags">
+          ${n.hashtags.map(h => `<span class="hashtag">${h}</span>`).join('')}
+        </div>
+      </div>
+      <div class="card-score">
+        <span class="score-label">관심도</span>
+        <span class="score-value">${n.score}</span>
+        <div class="score-bar-wrap">
+          <div class="score-bar" style="width:0%" data-width="${n.score}%"></div>
+        </div>
+        <span class="trend-indicator ${n.trend === 'up' ? 'trend-up' : n.trend === 'down' ? 'trend-down' : 'trend-same'}">
+          ${n.trendText}
+        </span>
+      </div>
+      <div class="card-detail">
+        <div class="detail-inner">
+          <div class="detail-section">
+            <h4>배경 및 맥락</h4>
+            <p>${n.detail.background}</p>
+            <a class="source-link" href="${n.detail.source}" target="_blank" rel="noopener">
+              📎 원문 보기 →
+            </a>
+          </div>
+          <div class="detail-section">
+            <h4>핵심 포인트</h4>
+            <ul class="key-points">
+              ${n.detail.keyPoints.map(p => `<li>${p}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Animate score bars
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.score-bar').forEach(bar => {
+      setTimeout(() => { bar.style.width = bar.dataset.width; }, 100);
+    });
+  });
+}
+
+// ===== TOGGLE DETAIL =====
+function toggleDetail(card) {
+  const detail = card.querySelector('.card-detail');
+  const isOpen = detail.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.card-detail.open').forEach(d => d.classList.remove('open'));
+  if (!isOpen) detail.classList.add('open');
+}
+
+// ===== FILTER =====
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCards(btn.dataset.filter);
+  });
+});
+
+// ===== CHART =====
+let chartInstance = null;
+
+const chartColors = {
+  bar: {
+    backgrounds: [
+      'rgba(255,215,0,0.75)',
+      'rgba(192,192,192,0.75)',
+      'rgba(205,127,50,0.75)',
+      'rgba(108,99,255,0.75)',
+      'rgba(67,217,173,0.75)',
+    ],
+    borders: ['#ffd700','#c0c0c0','#cd7f32','#6c63ff','#43d9ad'],
+  }
+};
+
+const labels = newsData.map(n => `${n.rank}위`);
+const scores = newsData.map(n => n.score);
+const fullLabels = newsData.map(n => n.title.substring(0, 18) + '…');
+
+function buildChart(type = 'bar') {
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: type !== 'bar',
+        labels: { color: '#8892b0', font: { family: 'Noto Sans KR', size: 12 } }
+      },
+      tooltip: {
+        backgroundColor: '#1a1d27',
+        borderColor: 'rgba(108,99,255,0.3)',
+        borderWidth: 1,
+        titleColor: '#e8eaf6',
+        bodyColor: '#8892b0',
+        callbacks: {
+          title: (items) => fullLabels[items[0].dataIndex] || labels[items[0].dataIndex],
+          label: (item) => ` 관심도 점수: ${item.raw}`
+        }
+      }
+    }
+  };
+
+  if (type === 'bar') {
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: fullLabels,
+        datasets: [{
+          label: '관심도 점수',
+          data: scores,
+          backgroundColor: chartColors.bar.backgrounds,
+          borderColor: chartColors.bar.borders,
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        ...commonOptions,
+        scales: {
+          x: {
+            ticks: { color: '#8892b0', font: { size: 11 }, maxRotation: 15 },
+            grid: { color: 'rgba(255,255,255,0.04)' }
+          },
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { color: '#8892b0', stepSize: 20 },
+            grid: { color: 'rgba(255,255,255,0.07)' }
+          }
+        }
+      }
+    });
+  } else if (type === 'radar') {
+    chartInstance = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: newsData.map((n, i) => ({
+          label: `${n.rank}위 ${n.categoryLabel}`,
+          data: labels.map((_, j) => j === i ? n.score : Math.max(n.score - 30 + Math.random()*20, 10)),
+          borderColor: chartColors.bar.borders[i],
+          backgroundColor: chartColors.bar.backgrounds[i].replace('0.75','0.15'),
+          pointBackgroundColor: chartColors.bar.borders[i],
+          borderWidth: 2,
+        }))
+      },
+      options: {
+        ...commonOptions,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { color: '#8892b0', stepSize: 25, backdropColor: 'transparent' },
+            grid: { color: 'rgba(255,255,255,0.08)' },
+            pointLabels: { color: '#8892b0', font: { size: 12 } }
+          }
+        }
+      }
+    });
+  } else if (type === 'doughnut') {
+    chartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: fullLabels,
+        datasets: [{
+          data: scores,
+          backgroundColor: chartColors.bar.backgrounds,
+          borderColor: chartColors.bar.borders,
+          borderWidth: 2,
+          hoverOffset: 12,
+        }]
+      },
+      options: {
+        ...commonOptions,
+        cutout: '62%',
+        plugins: {
+          ...commonOptions.plugins,
+          legend: {
+            display: true,
+            position: 'right',
+            labels: {
+              color: '#8892b0',
+              font: { family: 'Noto Sans KR', size: 11 },
+              boxWidth: 14,
+              padding: 14,
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+document.querySelectorAll('.chart-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    buildChart(tab.dataset.chart);
+  });
+});
+
+// ===== SHARE =====
+document.getElementById('shareBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  });
+});
+
+// ===== INIT =====
+buildTicker();
+setDate();
+renderCards();
+buildChart('bar');
+</script>
+</body>
+</html>
