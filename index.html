@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Wealth Report — Daily Financial Insight</title>
+    <title>The Wealth Report — Minimalist Luxury</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg-primary: #0a0b0d;
-            --bg-secondary: #14161a;
-            --accent-gold: #c5a059;
-            --accent-gold-light: #e2c28d;
-            --text-primary: #f2f2f2;
-            --text-secondary: #a0a0a0;
-            --border-color: rgba(197, 160, 89, 0.2);
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --bg-main: #0c0c0c;
+            --bg-card: #1a1a1a;
+            --text-light: #e0e0e0;
+            --text-dark: #a0a0a0;
+            --accent-gold: #b8860b; /* Darker gold for subtle luxury */
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --transition-ease: all 0.3s ease-out;
         }
 
         * {
@@ -28,206 +27,217 @@
         }
 
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.7;
             overflow-x: hidden;
+            font-size: 16px;
         }
 
-        /* 고급스러운 배경 효과 */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% -20%, rgba(197, 160, 89, 0.08) 0%, transparent 60%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* Typography */
-        h1, h2, h3, .serif {
-            font-family: 'Playfair Display', serif;
+        /* Global Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
         }
 
         /* Header */
         header {
-            padding: 80px 20px 40px;
             text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            border-bottom: 1px solid var(--border-color);
+            padding: 80px 0 50px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 50px;
         }
 
-        .logo {
-            font-size: 14px;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: var(--accent-gold);
+        .header-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-dark);
             margin-bottom: 20px;
-            font-weight: 600;
         }
 
-        header h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 900;
-            margin-bottom: 15px;
-            letter-spacing: -0.02em;
+        .header-date {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            font-weight: 300;
         }
 
-        .date-line {
-            font-family: 'Libre Baskerville', serif;
-            font-style: italic;
-            color: var(--text-secondary);
-            font-size: 18px;
-            margin-bottom: 30px;
-        }
-
-        /* Ticker - 세련된 스타일 */
-        .ticker-container {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
+        /* Ticker */
+        .ticker-wrapper {
+            background-color: var(--bg-card);
             padding: 12px 0;
             overflow: hidden;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .ticker-wrap {
+        .ticker-content {
             display: flex;
             white-space: nowrap;
-            animation: ticker 40s linear infinite;
+            animation: tickerAnimation 35s linear infinite;
         }
 
-        @keyframes ticker {
-            0% { transform: translateX(0); }
+        @keyframes tickerAnimation {
+            0% { transform: translateX(0%); }
             100% { transform: translateX(-50%); }
         }
 
         .ticker-item {
-            padding: 0 40px;
-            font-size: 13px;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
+            padding: 0 30px;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            flex-shrink: 0;
         }
 
         .ticker-item strong {
             color: var(--accent-gold);
-            margin-right: 10px;
+            margin-right: 8px;
         }
 
-        /* Filter */
+        /* Filter Navigation */
         .filter-nav {
             display: flex;
             justify-content: center;
             gap: 30px;
-            margin: 40px 0;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 50px;
         }
 
         .filter-btn {
             background: none;
             border: none;
-            color: var(--text-secondary);
-            font-size: 14px;
+            color: var(--text-dark);
+            font-size: 1rem;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.1em;
             cursor: pointer;
             padding-bottom: 8px;
-            border-bottom: 1px solid transparent;
-            transition: var(--transition);
+            position: relative;
+            transition: var(--transition-ease);
         }
 
-        .filter-btn:hover, .filter-btn.active {
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--accent-gold);
+            transform: scaleX(0);
+            transition: transform 0.3s ease-out;
+        }
+
+        .filter-btn:hover::after, .filter-btn.active::after {
+            transform: scaleX(1);
+        }
+
+        .filter-btn.active {
             color: var(--accent-gold);
-            border-bottom: 1px solid var(--accent-gold);
         }
 
-        /* Ranking Grid */
-        main {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .ranking-container {
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
+        /* Ranking Cards */
+        .ranking-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
         }
 
         .rank-card {
-            display: grid;
-            grid-template-columns: 80px 1fr 200px;
-            background: var(--bg-secondary);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
             padding: 40px;
-            position: relative;
-            transition: var(--transition);
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            transition: var(--transition-ease);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rank-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(184, 134, 11, 0.05) 0%, transparent 30%);
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
         }
 
         .rank-card:hover {
-            border-color: var(--border-color);
             transform: translateY(-5px);
-            box-shadow: var(--card-shadow);
+            box-shadow: var(--shadow-deep);
+            border-color: var(--accent-gold);
+        }
+
+        .rank-card:hover::before {
+            opacity: 1;
         }
 
         .rank-number {
             font-family: 'Playfair Display', serif;
-            font-size: 48px;
-            font-weight: 900;
+            font-size: 3.5rem;
+            font-weight: 700;
             color: var(--accent-gold);
-            opacity: 0.5;
+            line-height: 1;
+            flex-shrink: 0;
+            width: 70px;
+            text-align: center;
         }
 
         .card-content h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
             line-height: 1.3;
+            margin-bottom: 12px;
+            color: var(--text-light);
         }
 
         .card-meta {
-            font-size: 12px;
+            font-size: 0.8rem;
+            color: var(--text-dark);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--accent-gold);
+            letter-spacing: 0.08em;
             margin-bottom: 10px;
-            display: flex;
-            gap: 15px;
         }
 
         .card-summary {
-            color: var(--text-secondary);
-            font-size: 16px;
+            font-size: 1rem;
+            color: var(--text-dark);
             margin-bottom: 20px;
-            max-width: 90%;
         }
 
-        .card-stats {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-end;
-            text-align: right;
-            border-left: 1px solid rgba(255, 255, 255, 0.05);
-            padding-left: 30px;
-        }
-
-        .score-value {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            font-weight: 700;
+        .impact-score {
+            font-size: 1.8rem;
+            font-weight: 500;
             color: var(--accent-gold);
+            text-align: right;
+            flex-shrink: 0;
+            width: 100px;
         }
 
-        .score-label {
-            font-size: 11px;
+        .impact-score span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-dark);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            margin-top: 5px;
         }
 
         /* Detail Section */
@@ -235,14 +245,15 @@
             grid-column: 1 / -1;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: max-height 0.6s ease-out;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            padding: 0 40px;
         }
 
         .card-detail.open {
-            max-height: 800px;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            max-height: 600px; /* Adjust as needed */
+            padding: 30px 40px;
         }
 
         .detail-grid {
@@ -252,45 +263,52 @@
         }
 
         .detail-section h4 {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: var(--accent-gold);
             margin-bottom: 15px;
         }
 
         .detail-section p, .detail-section li {
-            font-size: 15px;
-            color: var(--text-secondary);
+            font-size: 0.95rem;
+            color: var(--text-dark);
             margin-bottom: 10px;
         }
 
-        .key-list {
+        .key-points-list {
             list-style: none;
         }
 
-        .key-list li::before {
-            content: "—";
-            margin-right: 10px;
+        .key-points-list li::before {
+            content: '•';
             color: var(--accent-gold);
+            margin-right: 10px;
         }
 
         /* Chart Section */
-        .analysis-section {
-            margin-top: 100px;
-            padding: 60px;
-            background: var(--bg-secondary);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+        .chart-section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 50px;
+            margin-top: 80px;
         }
 
-        .analysis-header {
+        .chart-header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
-        .analysis-header h3 {
-            font-size: 32px;
+        .chart-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
             margin-bottom: 10px;
+        }
+
+        .chart-header p {
+            font-size: 1rem;
+            color: var(--text-dark);
         }
 
         .chart-container {
@@ -300,81 +318,60 @@
 
         /* Footer */
         footer {
-            margin-top: 100px;
-            padding: 60px 20px;
             text-align: center;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            font-size: 13px;
+            padding: 60px 25px;
+            color: var(--text-dark);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 80px;
         }
 
-        .footer-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            color: var(--accent-gold);
-            margin-bottom: 20px;
+        .footer-text {
+            margin-top: 15px;
         }
 
         /* Responsive */
-        @media (max-width: 900px) {
-            .rank-card {
-                grid-template-columns: 1fr;
-                padding: 30px;
-            }
-            .rank-number { margin-bottom: 10px; }
-            .card-stats {
-                border-left: none;
-                border-top: 1px solid rgba(255, 255, 255, 0.05);
-                padding-left: 0;
-                padding-top: 20px;
-                align-items: flex-start;
-                text-align: left;
-            }
+        @media (max-width: 768px) {
+            .header-logo { font-size: 3rem; }
+            .rank-card { flex-direction: column; align-items: center; text-align: center; padding: 30px; }
+            .rank-number { margin-bottom: 20px; }
+            .impact-score { text-align: center; margin-top: 20px; }
             .detail-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Animations */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.8s forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
+            .card-detail.open { padding: 20px 30px; }
+            .chart-section { padding: 30px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="ticker-container">
-        <div class="ticker-wrap" id="ticker">
+    <div class="ticker-wrapper">
+        <div class="ticker-content" id="ticker">
             <!-- Ticker items will be injected -->
         </div>
     </div>
 
-    <header class="fade-in">
-        <div class="logo">Exclusive Intelligence</div>
-        <h1>The Wealth Report</h1>
-        <div class="date-line" id="today-date">April 30, 2026</div>
+    <header class="container">
+        <div class="header-logo">The Wealth Report</div>
+        <p class="header-subtitle">Exclusive Insights for the Discerning Investor</p>
+        <div class="header-date" id="today-date"></div>
     </header>
 
-    <nav class="filter-nav fade-in">
-        <button class="filter-btn active" onclick="filterRankings('all')">전체 리포트</button>
-        <button class="filter-btn" onclick="filterRankings('economy')">금융 & 시장</button>
-        <button class="filter-btn" onclick="filterRankings('policy')">정책 & 규제</button>
-        <button class="filter-btn" onclick="filterRankings('tech')">미래 기술</button>
+    <nav class="filter-nav container">
+        <button class="filter-btn active" onclick="filterRankings('all')">All Reports</button>
+        <button class="filter-btn" onclick="filterRankings('economy')">Financial Markets</button>
+        <button class="filter-btn" onclick="filterRankings('policy')">Policy & Regulation</button>
+        <button class="filter-btn" onclick="filterRankings('tech')">Future Tech</button>
     </nav>
 
-    <main>
-        <div class="ranking-container" id="ranking-list">
+    <main class="container">
+        <div class="ranking-grid" id="ranking-list">
             <!-- Ranking cards will be injected -->
         </div>
 
-        <section class="analysis-section fade-in">
-            <div class="analysis-header">
+        <section class="chart-section">
+            <div class="chart-header">
                 <h3>Market Sentiment Analysis</h3>
-                <p class="serif" style="color: var(--text-secondary); font-style: italic;">주요 경제 지표 및 이슈 관심도 분석</p>
+                <p>Key economic indicators and issue interest analysis.</p>
             </div>
             <div class="chart-container">
                 <canvas id="wealthChart"></canvas>
@@ -384,142 +381,132 @@
 
     <footer>
         <div class="footer-logo">The Wealth Report</div>
-        <p>© 2026 Premium Financial Insight. All rights reserved.</p>
-        <p style="margin-top: 10px; letter-spacing: 0.1em;">데이터는 매일 자정에 자동으로 갱신됩니다.</p>
+        <p>&#169; 2026 Premium Financial Insight. All rights reserved.</p>
+        <p class="footer-text">Data automatically updated daily at midnight.</p>
     </footer>
 
     <script>
-        // 뉴스 데이터 (경제 중심 순위)
         const newsData = [
             {
                 rank: 1,
                 category: "economy",
-                categoryLabel: "금융 & 시장",
-                title: "코스피 사상 최고가 경신 — 빅테크 AI 투자 열풍에 6750선 터치",
-                summary: "글로벌 빅테크 기업들의 인공지능(AI) 설비 투자 확대 소식에 힘입어 국내 증시가 장중 사상 최고치를 경신했습니다. 삼성전자와 SK하이닉스를 중심으로 외국인 매수세가 집중되며 시장의 자금 흐름이 IT 기술주로 쏠리고 있습니다.",
+                categoryLabel: "Financial Markets",
+                title: "KOSPI Hits All-Time High — AI Investment Boom Drives to 6750",
+                summary: "Global big tech companies' increased AI infrastructure spending propels KOSPI to an all-time high during intraday trading. Foreign and institutional buying is concentrated on Samsung Electronics and SK Hynix, shifting market capital towards IT growth stocks.",
                 score: 98,
                 detail: {
-                    background: "미국 빅테크들의 호실적과 AI 투자 지속 의지가 확인되면서 아시아 증시 전반에 훈풍이 불고 있습니다. 특히 반도체 공급망의 핵심인 한국 시장에 대한 재평가가 이루어지고 있는 시점입니다.",
+                    background: "Strong earnings from US big tech and sustained AI investment commitment are boosting Asian stock markets. The Korean market, a crucial part of the semiconductor supply chain, is undergoing a re-evaluation.",
                     keyPoints: [
-                        "코스피 6750선 돌파, 장중 최고가 경신",
-                        "외국인 및 기관 동반 순매수 유입",
-                        "AI 반도체 밸류체인 기업 주가 급등",
-                        "유가 상승 및 금리 인하 지연 우려가 잠재적 리스크로 상존"
+                        "KOSPI breaks 6750, setting a new intraday record",
+                        "Inflow of foreign and institutional net buying",
+                        "AI semiconductor value chain stocks see sharp gains",
+                        "Rising oil prices and delayed interest rate cuts remain potential risks"
                     ]
                 }
             },
             {
                 rank: 2,
-                category: "economy",
-                categoryLabel: "정책 & 경제",
-                title: "美 FOMC 금리 동결 — 韓 금융당국 '외환시장 변동성' 밀착 모니터링",
-                summary: "미국 연준(Fed)이 기준금리를 3.75%로 동결하며 고금리 기조를 유지함에 따라 달러/원 환율이 1,480원대를 위협하고 있습니다. 정부는 경제·금융 수장 회의를 소집해 시장 안정화 대책을 논의했습니다.",
+                category: "policy",
+                categoryLabel: "Policy & Regulation",
+                title: "US FOMC Freezes Rates — Korean Financial Authorities Monitor FX Volatility",
+                summary: "As the US Federal Reserve maintains its high-interest rate stance by freezing the benchmark rate at 3.75%, the USD/KRW exchange rate is threatening the 1,480 won level. The government convened a meeting of economic and financial leaders to discuss market stabilization measures.",
                 score: 94,
                 detail: {
-                    background: "미국의 금리 인하 기대감이 후퇴하면서 한미 금리차에 따른 자본 유출 우려가 커지고 있습니다. 기획재정부와 한국은행은 환율 변동성에 대응하기 위한 가용 수단을 점검하고 있습니다.",
+                    background: "Expectations for US interest rate cuts have receded, raising concerns about capital outflow due to the interest rate differential between Korea and the US. The Ministry of Economy and Finance and the Bank of Korea are reviewing available tools to respond to exchange rate volatility.",
                     keyPoints: [
-                        "미국 기준금리 3.75% 동결 결정",
-                        "달러/원 환율 1,480~1,490원대 전망",
-                        "경제·금융 수장 '거시경제금융회의' 개최",
-                        "수출 기업 채산성 악화 방지 대책 마련"
+                        "US benchmark interest rate frozen at 3.75%",
+                        "USD/KRW exchange rate forecast to be between 1,480 and 1,490 won",
+                        "Macroeconomic and Financial Meeting convened by economic and financial leaders",
+                        "Measures being prepared to prevent deterioration of export companies' profitability"
                     ]
                 }
             },
             {
                 rank: 3,
                 category: "economy",
-                categoryLabel: "금융 서비스",
-                title: "생활 밀착형 금융 플랫폼 경쟁 가속 — KB·신한 등 대형 금융지주 '슈퍼앱' 승부수",
-                summary: "전통 금융권이 빅테크에 맞서 결제, 투자, 생활 서비스를 통합한 '슈퍼앱' 전략을 강화하고 있습니다. 소비 데이터 분석을 통한 맞춤형 자산 관리 서비스가 금융권의 새로운 수익 모델로 부상하고 있습니다.",
+                categoryLabel: "Financial Services",
+                title: "Competition Heats Up in Lifestyle Financial Platforms — KB, Shinhan Launch 'Super Apps'",
+                summary: "Traditional financial institutions are intensifying their 'super app' strategies, integrating payment, investment, and lifestyle services to compete with big tech. Personalized asset management services based on consumer data analysis are emerging as a new revenue model for the financial sector.",
                 score: 89,
                 detail: {
-                    background: "단순 뱅킹을 넘어 쇼핑, 여행, 건강관리까지 아우르는 금융 플랫폼 생태계 구축이 활발합니다. 고객 데이터를 얼마나 정교하게 활용하느냐가 미래 경쟁력의 핵심이 되고 있습니다.",
+                    background: "The creation of financial platform ecosystems that encompass banking, shopping, travel, and healthcare is accelerating. How precisely customer data is utilized will be key to future competitiveness.",
                     keyPoints: [
-                        "KB국민은행·신한은행 등 슈퍼앱 고도화 경쟁",
-                        "AI 기반 맞춤형 자산관리(Wealth Management) 강화",
-                        "5월 가정의 달 맞이 소비 데이터 기반 프로모션 확대",
-                        "비금융 데이터 연계 마이데이터 서비스 차별화"
+                        "KB Kookmin Bank, Shinhan Bank, etc., competing to advance super apps",
+                        "Strengthening AI-based Wealth Management",
+                        "May Family Month promotions based on consumer data",
+                        "Differentiating MyData services by linking non-financial data"
                     ]
                 }
             },
             {
                 rank: 4,
                 category: "policy",
-                categoryLabel: "정책 & 규제",
-                title: "트럼프 관세 리스크 장기화 — 글로벌 공급망 '에너지-식량' 안보 비상",
-                summary: "미국 대법원의 일부 관세 무효 판결에도 불구하고 트럼프 행정부의 보호무역 기조가 강화되면서 글로벌 교역 증가율이 둔화될 것으로 보입니다. 특히 에너지와 식량 자원의 공급망 재편이 경제의 핵심 변수로 떠올랐습니다.",
+                categoryLabel: "Policy & Regulation",
+                title: "Prolonged Trump Tariff Risk — Global Supply Chain 'Energy-Food' Security Alert",
+                summary: "Despite the US Supreme Court's ruling invalidating some tariffs, the Trump administration's protectionist stance is strengthening, expected to slow global trade growth. The restructuring of energy and food supply chains has emerged as a critical variable for the economy.",
                 score: 85,
                 detail: {
-                    background: "무역법 301조를 활용한 관세 압박이 지속되면서 한국 수출 기업들의 불확실성이 커지고 있습니다. 에너지 수입 의존도가 높은 한국 경제에 유가 상승은 물가 압박의 주된 원인이 됩니다.",
+                    background: "Continued tariff pressure using Section 301 of the Trade Act is increasing uncertainty for Korean export companies. For Korea's import-dependent economy, rising oil prices are a major cause of inflationary pressure.",
                     keyPoints: [
-                        "UN, 글로벌 교역 증가율 전망치 2.2%로 하향",
-                        "에너지·식량 공급망 '냉전적' 대립 구도 형성",
-                        "국내 정유 및 화학 업계 원가 부담 가중",
-                        "공급망 다변화를 위한 정부 차원의 자원 외교 강화"
+                        "UN lowers global trade growth forecast to 2.2%",
+                        "'Cold War'-like confrontation forming in energy and food supply chains",
+                        "Increased cost burden on domestic refining and chemical industries",
+                        "Strengthening government-level resource diplomacy for supply chain diversification"
                     ]
                 }
             },
             {
                 rank: 5,
                 category: "tech",
-                categoryLabel: "미래 기술",
-                title: "스탠퍼드 AI 인덱스 2026 — 한국, AI 모델 경쟁력 세계 상위권 안착",
-                summary: "한국이 개발한 AI 모델 수가 당초 예상보다 많은 8개로 확인되며 기술 경쟁력을 입증했습니다. 하지만 기술 발전에 따른 일자리 감소 우려와 AI 보안 이슈가 새로운 사회적 과제로 부각되고 있습니다.",
+                categoryLabel: "Future Tech",
+                title: "Stanford AI Index 2026 — Korea's AI Model Competitiveness Ranks High Globally",
+                summary: "The number of AI models developed by Korea has been confirmed to be 8, more than initially expected, proving its technological competitiveness. However, concerns about job displacement due to technological advancement and AI security issues are emerging as new social challenges.",
                 score: 81,
                 detail: {
-                    background: "2026 월드 IT 쇼에서 확인된 것처럼 AI는 이제 실험실을 벗어나 산업 현장의 핵심 인프라로 자리 잡았습니다. 보안 플랫폼과 AI 윤리에 대한 투자가 병행되어야 하는 시점입니다.",
+                    background: "As seen at the 2026 World IT Show, AI has moved beyond laboratories to become a core infrastructure in industrial sites. This is a time when investment in security platforms and AI ethics must go hand in hand.",
                     keyPoints: [
-                        "한국형 AI 모델 8개 등재 (스탠퍼드 보고서)",
-                        "AI 보안 플랫폼 '시큐어AI' 등 기술 보안 수요 급증",
-                        "인력 구조조정과 AI 투자 확대의 역설적 공존",
-                        "교육 및 의료 분야 AI 임베디드 인프라 전환 가속"
+                        "8 Korean AI models listed (Stanford report)",
+                        "AI security platform 'SecureAI' etc. tech security demand surge",
+                        "Paradoxical coexistence of workforce restructuring and increased AI investment",
+                        "Acceleration of AI embedded infrastructure transition in education and medical fields"
                     ]
                 }
             }
         ];
 
-        // 날짜 설정
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-            document.getElementById('today-date').innerText = new Date().toLocaleDateString('ko-KR', options);
+            document.getElementById('today-date').innerText = new Date().toLocaleDateString('en-US', options);
         }
 
-        // 티커 설정
         function buildTicker() {
             const ticker = document.getElementById('ticker');
-            const items = newsData.map(n => `<div class="ticker-item"><strong>${n.rank}위</strong> ${n.title}</div>`);
-            ticker.innerHTML = items.join('') + items.join(''); // 무한 루프를 위해 복제
+            const items = newsData.map(n => `<div class="ticker-item"><strong>${n.rank}</strong> ${n.title}</div>`);
+            ticker.innerHTML = items.join('') + items.join('');
         }
 
-        // 카드 렌더링
         function renderRankings(filter = 'all') {
             const list = document.getElementById('ranking-list');
             const filtered = filter === 'all' ? newsData : newsData.filter(n => n.category === filter);
             
             list.innerHTML = filtered.map((n, index) => `
-                <div class="rank-card fade-in" style="animation-delay: ${index * 0.1}s" onclick="toggleDetail(this)">
+                <div class="rank-card" onclick="toggleDetail(this)">
                     <div class="rank-number">${n.rank}</div>
                     <div class="card-content">
-                        <div class="card-meta">
-                            <span>${n.categoryLabel}</span>
-                            <span>April 30, 2026</span>
-                        </div>
+                        <div class="card-meta">${n.categoryLabel} &bull; April 30, 2026</div>
                         <h2>${n.title}</h2>
                         <p class="card-summary">${n.summary}</p>
                     </div>
-                    <div class="card-stats">
-                        <div class="score-label">Impact Score</div>
-                        <div class="score-value">${n.score}</div>
-                    </div>
+                    <div class="impact-score">${n.score}<span>Impact Score</span></div>
                     <div class="card-detail">
                         <div class="detail-grid">
                             <div class="detail-section">
-                                <h4>인사이트 배경</h4>
+                                <h4>Background Insight</h4>
                                 <p>${n.detail.background}</p>
                             </div>
                             <div class="detail-section">
-                                <h4>핵심 포인트</h4>
-                                <ul class="key-list">
+                                <h4>Key Takeaways</h4>
+                                <ul class="key-points-list">
                                     ${n.detail.keyPoints.map(p => `<li>${p}</li>`).join('')}
                                 </ul>
                             </div>
@@ -529,12 +516,10 @@
             `).join('');
         }
 
-        // 상세 보기 토글
         function toggleDetail(card) {
             const detail = card.querySelector('.card-detail');
             const isOpen = detail.classList.contains('open');
             
-            // 다른 열린 카드 닫기
             document.querySelectorAll('.card-detail.open').forEach(d => d.classList.remove('open'));
             
             if (!isOpen) {
@@ -542,29 +527,25 @@
             }
         }
 
-        // 필터링
         function filterRankings(category) {
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.innerText.includes(category === 'all' ? '전체' : category === 'economy' ? '금융' : category === 'policy' ? '정책' : '기술')) {
-                    btn.classList.add('active');
-                }
             });
+            event.target.classList.add('active');
             renderRankings(category);
         }
 
-        // 차트 초기화
         function initChart() {
             const ctx = document.getElementById('wealthChart').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: newsData.map(n => `${n.rank}위`),
+                    labels: newsData.map(n => `Rank ${n.rank}`),
                     datasets: [{
-                        label: 'Market Impact Score',
+                        label: 'Impact Score',
                         data: newsData.map(n => n.score),
-                        backgroundColor: 'rgba(197, 160, 89, 0.6)',
-                        borderColor: '#c5a059',
+                        backgroundColor: 'rgba(184, 134, 11, 0.7)',
+                        borderColor: '#b8860b',
                         borderWidth: 1,
                         borderRadius: 5
                     }]
@@ -579,19 +560,18 @@
                         y: {
                             beginAtZero: true,
                             max: 100,
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            ticks: { color: '#a0a0a0' }
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                            ticks: { color: 'var(--text-dark)' }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#a0a0a0' }
+                            ticks: { color: 'var(--text-dark)' }
                         }
                     }
                 }
             });
         }
 
-        // 초기화 실행
         window.onload = () => {
             setDate();
             buildTicker();
@@ -601,4 +581,3 @@
     </script>
 </body>
 </html>
-/* Updated: Thu Apr 30 02:10:01 EDT 2026 */
